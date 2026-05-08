@@ -12,7 +12,7 @@ const STYLES = `
     background: #f5f4f0;
     min-height: 100vh;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
   }
