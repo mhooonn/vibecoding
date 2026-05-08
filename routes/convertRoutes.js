@@ -1,6 +1,7 @@
 const express = require("express");
 const { body } = require("express-validator");
 const { convertCurrency } = require("../controllers/convertController");
+const { deleteConversion } = require("../controllers/convertController");
 
 const router = express.Router();
 
@@ -28,5 +29,7 @@ router.post(
   ],
   convertCurrency
 );
+
+router.delete("/:id", deleteConversion);
 
 module.exports = router;

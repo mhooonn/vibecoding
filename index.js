@@ -7,6 +7,9 @@ const app = express();
 const { body } = require("express-validator");
 const { convertCurrency } = require("./controllers/convertController");
 
+const cors = require('cors');
+app.use(cors({ origin: 'http://localhost:5173' }));
+
 // 🔹 import routes
 const convertRoutes = require("./routes/convertRoutes");
 const Conversion = require("./models/Conversion");
@@ -75,8 +78,6 @@ app.post("/favorites/:id/delete", async (req, res) => {
 });
 
 app.use("/api/conversions", convertRoutes);
-
-
 
 // 🔹 server
 const PORT = process.env.PORT || 3000;

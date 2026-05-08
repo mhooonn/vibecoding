@@ -56,6 +56,18 @@ const convertCurrency = async (req, res) => {
   }
 };
 
+const deleteConversion = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const conversion = await Conversion.findByIdAndDelete(id);
+    if (!conversion) return res.status(404).json({ message: "Not found" });
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
-  convertCurrency
+  convertCurrency,
+  deleteConversion
 };
