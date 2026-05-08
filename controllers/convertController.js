@@ -1,58 +1,32 @@
-// controllers/convertController.js
 const Conversion = require("../models/Conversion");
 const { validationResult } = require("express-validator");
 
 const convertCurrency = async (req, res) => {
   try {
     const errors = validationResult(req);
-
-    const responseCurrencies = await fetch("https://api.frankfurter.app/currencies");
-    const currencies = await responseCurrencies.json();
-
-    const currencyList = Object.entries(currencies).map(([code, name]) => ({
-      code,
-      name
-    }));
-
     if (!errors.isEmpty()) {
-      return res.render("index", {
-        errors: errors.array(),
-        currencyList,
-        title: "Currency Converter",
-        oldInput: req.body
-      });
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const { amount, from, to } = req.body;
 
     const url = `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`;
-
     const response = await fetch(url);
     const data = await response.json();
 
     if (!data.rates || !data.rates[to]) {
-      return res.status(500).send("Conversion failed");
+      return res.status(500).json({ message: "Conversion failed" });
     }
 
     const result = data.rates[to];
 
-    await Conversion.create({
-      from,
-      to,
-      amount,
-      result
-    });
+    const conversion = await Conversion.create({ from, to, amount, result });
 
-    return res.render("index", {
-      result,
-      currencyList,
-      title: "Currency Converter",
-      oldInput: req.body
-    });
+    return res.status(201).json(conversion);
 
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server error");
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -67,7 +41,13 @@ const deleteConversion = async (req, res) => {
   }
 };
 
-module.exports = {
-  convertCurrency,
-  deleteConversion
+const getConversions = async (req, res) => {
+  try {
+    const conversions = await Conversion.find();
+    res.json(conversions);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
+
+module.exports = { convertCurrency, deleteConversion, getConversions };

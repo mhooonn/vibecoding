@@ -2,18 +2,22 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+const cors = require('cors');
+
+
 const app = express();
 
 const { body } = require("express-validator");
 const { convertCurrency } = require("./controllers/convertController");
 
-const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:5173' }));
+
 
 // 🔹 import routes
 const convertRoutes = require("./routes/convertRoutes");
 const Conversion = require("./models/Conversion");
 const Favorite = require("./models/favorite");
+
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 // 🔹 middleware
 app.use(express.urlencoded({ extended: true }));
@@ -78,6 +82,22 @@ app.post("/favorites/:id/delete", async (req, res) => {
 });
 
 app.use("/api/conversions", convertRoutes);
+
+app.get("/api/favorites", async (req, res) => {
+  const favorites = await Favorite.find().sort({ _id: -1 }).lean();
+  res.json(favorites);
+});
+
+app.post("/api/favorites", async (req, res) => {
+  const { from, to, amount, result } = req.body;
+  const fav = await Favorite.create({ from, to, amount, result });
+  res.status(201).json(fav);
+});
+
+app.delete("/api/favorites/:id", async (req, res) => {
+  await Favorite.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
+});
 
 // 🔹 server
 const PORT = process.env.PORT || 3000;
