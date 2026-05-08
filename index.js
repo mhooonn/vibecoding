@@ -18,27 +18,6 @@ app.use(express.json());
 // static files
 app.use(express.static('public'));
 
-// 🔹 view engine (ONLY if using Handlebars)
-const { engine } = require("express-handlebars");
-
-const hbs = engine({
-  helpers: {
-    ifEquals(a, b, options) {
-      return a === b ? options.fn(this) : options.inverse(this);
-    }
-  }
-});
-
-app.engine("handlebars", engine({
-  helpers: {
-    eq: function (a, b) {
-      return a === b;
-    }
-  }
-}));
-app.set("view engine", "handlebars");
-app.set("views", "./views");
-
 // 🔹 MongoDB connection
 const uri = process.env.URI;
 
